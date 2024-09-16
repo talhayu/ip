@@ -4,10 +4,17 @@ const app = express();
 app.set('trust proxy', true);
 
 app.get('/', (req, res) => {
-    const header = req.headers
-    console.log(req.ip)
-    res.send(`Client IP Address: ${req.ip}`);
+    let clientIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+
+    // If the IP is in IPv6-mapped IPv4 format, convert it to standard IPv4
+    if (clientIp.startsWith("::ffff:")) {
+        clientIp = clientIp.split("::ffff:")[1];
+    }
+
+    console.log(clientIp);
+    res.send(`Client IP Address: ${clientIp}`);
 });
+
 
 const PORT = 3000;
 
